@@ -1,19 +1,23 @@
-package routes
+package api
 
 import "net/http"
 
-func (r *Router) newRoutingV1() *Routing {
-	routing := &Routing{
-		Version: "v1",
-		Router:  r,
+type RoutingV1 struct {
+	Routing
+}
+
+func (a *Api) newRoutingV1() *RoutingV1 {
+	routing := &RoutingV1{
+		Routing{Api: a},
 	}
+	routing.Version = "v1"
 	routing.PathPrefix = "/" + routing.Version
 	routing.Routes = routing.getV1Routes()
 
 	return routing
 }
 
-func (r *Routing) getV1Routes() []Route {
+func (r *RoutingV1) getV1Routes() []Route {
 
 	return []Route{
 		{

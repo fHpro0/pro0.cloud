@@ -1,8 +1,7 @@
-package routes
+package api
 
 import (
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ type Routing struct {
 	Version    string
 	PathPrefix string
 	Routes     []Route
-	Router     *Router
+	Api        *Api
 }
 
 type Route struct {
@@ -25,21 +24,16 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-func Routes() *Router {
+func (a *Api) newRouter() *Router {
 	r := &Router{
 		Router: mux.NewRouter(),
 	}
 
 	// API-Routes initialize
-	apiVersions := []func() *Routing{r.newRoutingV1}
-	for _, version := range apiVersions {
-		v := version()
-		rV := r.PathPrefix("/api" + v.PathPrefix).Subrouter()
-
-		for _, route := range v.Routes {
-			rV.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method, "OPTIONS")
-		}
-		log.Println("=-> initialized API route " + v.Version)
+	apiV1 := a.newRoutingV1()
+	rV1 := r.PathPrefix(apiV1.PathPrefix).Subrouter()
+	for _, route := range apiV1.Routes {
+		rV1.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method, "OPTIONS")
 	}
 
 	// Frontend

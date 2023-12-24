@@ -3,7 +3,6 @@
 CMS written in Go (Backend) and Vue (Frontend).
 
 Used Frameworks:
-- [templ](https://github.com/a-h/templ)
 - [httpsnoop](github.com/felixge/httpsnoop)
 - [handlers](github.com/gorilla/handlers)
 - [mux](github.com/gorilla/mux)

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
-	"strings"
-
-	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
-	"pro0.cloud/v2/routes"
+	"log"
+	"os"
+	"pro0.cloud/v2/api"
+	"strings"
+)
+
+var (
+	a *api.Api
 )
 
 func main() {
@@ -17,20 +18,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	port := os.Getenv("port")
-	allowOrigins := strings.Split(os.Getenv("allowOrigins"), ",")
-	allowedMethods := strings.Split(os.Getenv("allowedMethods"), ",")
-	allowedHeaders := strings.Split(os.Getenv("allowedHeaders"), ",")
-	exposedHeaders := strings.Split(os.Getenv("exposedHeaders"), ",")
+	address := os.Getenv("address")
 
-	// Start API
-	log.Println("=> Starting API on port: " + port)
-	apiHandlers := handlers.CORS(
-		handlers.AllowedOrigins(allowOrigins),
-		handlers.AllowedMethods(allowedMethods),
-		handlers.AllowedHeaders(allowedHeaders),
-		handlers.ExposedHeaders(exposedHeaders),
-		handlers.AllowCredentials())(routes.Routes().Router)
-	_ = http.ListenAndServe(":"+port, apiHandlers)
+	handlerConfig := api.HandlerConfig{
+		AllowedOrigins:   strings.Split(os.Getenv("allowOrigins"), ","),
+		AllowedMethods:   strings.Split(os.Getenv("allowedMethods"), ","),
+		AllowedHeaders:   strings.Split(os.Getenv("allowedHeaders"), ","),
+		ExposedHeaders:   strings.Split(os.Getenv("exposedHeaders"), ","),
+		AllowCredentials: true,
+	}
 
+	// Initialize server
+	a = api.NewApi()
+
+	// Start server
+	_ = a.Start(address, handlerConfig)
 }
