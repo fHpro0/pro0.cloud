@@ -30,7 +30,7 @@ func main() {
 		handlers.AllowedMethods(allowedMethods),
 		handlers.AllowedHeaders(allowedHeaders),
 		handlers.ExposedHeaders(exposedHeaders),
-		handlers.AllowCredentials())(routes.Routes())
+		handlers.AllowCredentials())(routes.Routes().Router)
 	_ = http.ListenAndServe(":"+port, apiHandlers)
 
 }
