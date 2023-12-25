@@ -21,6 +21,7 @@ type Route struct {
 	Name        string
 	Method      string
 	Pattern     string
+	Public      bool
 	HandlerFunc http.HandlerFunc
 }
 
@@ -33,11 +34,22 @@ func (a *Api) newRouter() *Router {
 	apiV1 := a.newRoutingV1()
 	rV1 := r.PathPrefix(apiV1.PathPrefix).Subrouter()
 	for _, route := range apiV1.Routes {
-		rV1.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method, "OPTIONS")
+		if route.Public {
+			rV1.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method, "OPTIONS")
+			continue
+		}
+		rV1.HandleFunc(route.Pattern, wrapHandlerFunc(route.HandlerFunc, a.authMiddleware)).Methods(route.Method, "OPTIONS")
 	}
 
 	// Frontend
-	r.Router.PathPrefix("/").Handler(http.FileServer(http.Dir("./ui/dist/"))).Methods("GET")
+	// r.Router.PathPrefix("/").Handler(http.FileServer(http.Dir("./ui/dist/"))).Methods("GET")
 
 	return r
+}
+
+// wrapHandlerFunc wraps standard http middleware as a http.HandlerFunc
+func wrapHandlerFunc(next http.HandlerFunc, handler func(http.Handler) http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		handler(next).ServeHTTP(w, r)
+	}
 }

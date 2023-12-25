@@ -70,3 +70,4 @@ ui/yarn-error.log
 .env
 
 .idea
+.idea/

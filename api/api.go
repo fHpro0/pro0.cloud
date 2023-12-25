@@ -9,14 +9,13 @@ import (
 
 type Api struct {
 	HttpServer    *http.Server
+	Secret        string
 	storageSecret *rsa.PrivateKey
 }
 
 func NewApi() *Api {
 	a := &Api{}
-
-	a.newSession()
-
+	a.newSecret()
 	return a
 }
 
