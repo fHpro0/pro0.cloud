@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"math/rand"
@@ -9,6 +10,11 @@ import (
 	"strings"
 	"time"
 )
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
 func (a *Api) newSecret() {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -69,4 +75,23 @@ func (a *Api) authMiddleware(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), "user_id", userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (a *Api) createToken(userID, username string) (string, error) {
+	claims := jwt.MapClaims{}
+	claims["user_id"] = userID
+	claims["username"] = username
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(a.Secret))
+}
+
+func (a *Api) Login(w http.ResponseWriter, r *http.Request) {
+	var loginReq LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("bad request"))
+		return
+	}
+
 }

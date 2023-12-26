@@ -4,10 +4,14 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"net/http"
+	"pro0.cloud/v2/lib/database"
+	metrics "pro0.cloud/v2/lib/metric"
 	"time"
 )
 
 type Api struct {
+	Db            *database.Db
+	Metrics       *metrics.Metrics
 	HttpServer    *http.Server
 	Secret        string
 	storageSecret *rsa.PrivateKey

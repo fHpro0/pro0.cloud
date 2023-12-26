@@ -9,3 +9,5 @@ Used Frameworks:
 - [securecookie](github.com/gorilla/securecookie)
 - [sessions](github.com/gorilla/sessions)
 - [godotenv](github.com/joho/godotenv)
+
+https://chrisentechnology.hashnode.dev/authentication-and-authorization-with-go-language-with-jwt
